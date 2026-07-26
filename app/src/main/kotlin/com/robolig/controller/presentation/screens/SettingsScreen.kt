@@ -41,7 +41,7 @@ import com.robolig.controller.presentation.theme.RoboligTheme
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-@Suppress("LongMethod")
+@Suppress("LongMethod", "LongParameterList")
 fun SettingsScreen(
     robotState: RobotState,
     onBackToDrive: () -> Unit,
@@ -51,6 +51,7 @@ fun SettingsScreen(
     onUseDeviceCameraChanged: (Boolean) -> Unit,
     onCubeDetectionChanged: (Boolean) -> Unit,
     onRefreshStatus: () -> Unit,
+    onNavigateToRfidManagement: () -> Unit,
 ) {
     val spacing = RoboligTheme.spacing
     var streamUrl by
@@ -120,7 +121,8 @@ fun SettingsScreen(
             ) {
                 Text(
                     text =
-                        "When enabled, the operator panel shows frames from this tablet's back camera instead of the MJPEG stream.",
+                        "When enabled, the operator panel shows frames from this tablet's " +
+                            "back camera instead of the MJPEG stream.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -167,7 +169,8 @@ fun SettingsScreen(
             ) {
                 Text(
                     text =
-                        "Overlay the live packet counter on the center of every control screen so you can verify the radio link at a glance.",
+                        "Overlay the live packet counter on the center of every control " +
+                            "screen so you can verify the radio link at a glance.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -179,6 +182,27 @@ fun SettingsScreen(
                         label = "Show Packets",
                         checked = robotState.showPacketsOverlay,
                         onToggle = onShowPacketsOverlayChanged,
+                    )
+                }
+            }
+
+            SettingsCard(
+                title = "RFID Yönetimi",
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = "Manage RFID UIDs for the 5 fixed city models.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.panel),
+                    verticalArrangement = Arrangement.spacedBy(spacing.panel),
+                ) {
+                    RoboligModeButton(
+                        label = "RFID Yönetimi",
+                        selected = false,
+                        onClick = onNavigateToRfidManagement,
                     )
                 }
             }

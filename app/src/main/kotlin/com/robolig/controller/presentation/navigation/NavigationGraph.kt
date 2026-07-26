@@ -31,6 +31,7 @@ import com.robolig.controller.presentation.viewmodel.SettingsViewModel
 
 private const val SETTINGS_ROUTE = "settings"
 private const val ABOUT_ROUTE = "about"
+private const val RFID_MANAGEMENT_ROUTE = "rfid_management"
 
 @Composable
 @Suppress("LongMethod")
@@ -169,6 +170,13 @@ fun NavigationGraph() {
                 onUseDeviceCameraChanged = settingsViewModel::toggleUseDeviceCamera,
                 onCubeDetectionChanged = settingsViewModel::toggleCubeDetection,
                 onRefreshStatus = settingsViewModel::refreshStatus,
+                onNavigateToRfidManagement = { navigateTo(RFID_MANAGEMENT_ROUTE) },
+            )
+        }
+
+        composable(route = RFID_MANAGEMENT_ROUTE) {
+            com.robolig.controller.presentation.rfid.RfidManagementScreen(
+                onNavigateBack = { navController.popBackStack() },
             )
         }
 

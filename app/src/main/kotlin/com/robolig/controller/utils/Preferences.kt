@@ -25,6 +25,13 @@ interface ControllerPreferences {
     fun updateUseDeviceCamera(enabled: Boolean)
 
     fun updateCubeDetectionEnabled(enabled: Boolean)
+
+    fun getRfidUid(city: com.robolig.controller.domain.model.City): String?
+
+    fun setRfidUid(
+        city: com.robolig.controller.domain.model.City,
+        uid: String?,
+    )
 }
 
 @Singleton
@@ -126,5 +133,20 @@ class ControllerPreferencesImpl
                 .apply()
 
             cubeDetectionEnabledState.value = enabled
+        }
+
+        override fun getRfidUid(city: com.robolig.controller.domain.model.City): String? {
+            return sharedPreferences.getString(PreferenceConstants.RFID_UID_CITY_PREFIX + city.name, null)
+        }
+
+        override fun setRfidUid(
+            city: com.robolig.controller.domain.model.City,
+            uid: String?,
+        ) {
+            if (uid == null) {
+                sharedPreferences.edit().remove(PreferenceConstants.RFID_UID_CITY_PREFIX + city.name).apply()
+            } else {
+                sharedPreferences.edit().putString(PreferenceConstants.RFID_UID_CITY_PREFIX + city.name, uid).apply()
+            }
         }
     }
