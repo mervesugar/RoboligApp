@@ -10,14 +10,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -26,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,7 +50,7 @@ fun RfidManagementScreen(
             TopAppBar(
                 title = { Text("RFID Yönetimi") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = onNavigateBack, enabled = !uiState.isSyncing) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Geri",
@@ -74,6 +78,7 @@ fun RfidManagementScreen(
                     value = uid,
                     onValueChange = { viewModel.onUidChanged(city, it) },
                     label = { Text(city.displayName) },
+                    enabled = !uiState.isSyncing,
                     isError = error != null,
                     supportingText = {
                         if (error != null) {
@@ -88,10 +93,46 @@ fun RfidManagementScreen(
             }
 
             if (uiState.saveStatusMessage != null) {
-                Text(text = uiState.saveStatusMessage!!)
+                Text(
+                    text = uiState.saveStatusMessage!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (uiState.syncProgressMessage != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    if (uiState.isSyncing) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    }
+                    Text(
+                        text = uiState.syncProgressMessage!!,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            if (uiState.syncErrorMessage != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = uiState.syncErrorMessage!!,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    OutlinedButton(
+                        onClick = { viewModel.retrySync() },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("Tekrar Dene")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -99,6 +140,7 @@ fun RfidManagementScreen(
             ) {
                 OutlinedButton(
                     onClick = { viewModel.clearFields() },
+                    enabled = !uiState.isSyncing,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text("Alanları Temizle")
@@ -106,6 +148,7 @@ fun RfidManagementScreen(
 
                 Button(
                     onClick = { viewModel.saveToTablet() },
+                    enabled = !uiState.isSyncing,
                     modifier = Modifier.weight(1f),
                 ) {
                     Text("Tablete Kaydet")
@@ -113,11 +156,25 @@ fun RfidManagementScreen(
             }
 
             Button(
-                onClick = { },
-                enabled = uiState.isSendToRobotEnabled,
+                onClick = { viewModel.sendToRobot() },
+                enabled = uiState.isSendToRobotEnabled && !uiState.isSyncing,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Robota Gönder")
+                if (uiState.isSyncing) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.dp,
+                        )
+                        Text("Robota Gönderiliyor...")
+                    }
+                } else {
+                    Text("Robota Gönder")
+                }
             }
         }
     }

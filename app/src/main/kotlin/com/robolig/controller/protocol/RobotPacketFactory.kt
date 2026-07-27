@@ -139,6 +139,66 @@ class RobotPacketFactory
                 timestampMillis = timestamp(),
             )
 
+        fun createRfidConfigBeginPacket(
+            robotMode: RobotMode,
+            safetyState: SafetyState,
+            beginPayload: RfidConfigBeginPayload,
+        ): Packet =
+            Packet(
+                type = PacketType.RFID_CONFIG_BEGIN,
+                sequenceNumber = sequenceGenerator.next(),
+                flags =
+                    buildFlags(
+                        robotMode = robotMode,
+                        safetyState = safetyState,
+                        precisionMode = false,
+                        armLocked = false,
+                        vehicleLocked = false,
+                    ),
+                payload = beginPayload.toPayloadBytes(),
+                timestampMillis = timestamp(),
+            )
+
+        fun createRfidConfigItemPacket(
+            robotMode: RobotMode,
+            safetyState: SafetyState,
+            itemPayload: RfidConfigItemPayload,
+        ): Packet =
+            Packet(
+                type = PacketType.RFID_CONFIG_ITEM,
+                sequenceNumber = sequenceGenerator.next(),
+                flags =
+                    buildFlags(
+                        robotMode = robotMode,
+                        safetyState = safetyState,
+                        precisionMode = false,
+                        armLocked = false,
+                        vehicleLocked = false,
+                    ),
+                payload = itemPayload.toPayloadBytes(),
+                timestampMillis = timestamp(),
+            )
+
+        fun createRfidConfigCommitPacket(
+            robotMode: RobotMode,
+            safetyState: SafetyState,
+            commitPayload: RfidConfigCommitPayload,
+        ): Packet =
+            Packet(
+                type = PacketType.RFID_CONFIG_COMMIT,
+                sequenceNumber = sequenceGenerator.next(),
+                flags =
+                    buildFlags(
+                        robotMode = robotMode,
+                        safetyState = safetyState,
+                        precisionMode = false,
+                        armLocked = false,
+                        vehicleLocked = false,
+                    ),
+                payload = commitPayload.toPayloadBytes(),
+                timestampMillis = timestamp(),
+            )
+
         private fun timestamp(): Int = (clock.elapsedRealtimeMs().toInt() and ProtocolConstants.TIMESTAMP_MASK)
     }
 

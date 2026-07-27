@@ -1,6 +1,7 @@
 package com.robolig.controller.presentation.rfid
 
 import com.robolig.controller.domain.model.City
+import com.robolig.controller.domain.rfid.RfidSyncStage
 
 data class RfidManagementUiState(
     val cityUids: Map<City, String> = City.entries.associateWith { "" },
@@ -11,4 +12,8 @@ data class RfidManagementUiState(
     val isReadyToSendToRobot: Boolean = false,
     val canSendToRobot: Boolean = false,
     val isSendToRobotEnabled: Boolean = false,
+    val isSyncing: Boolean = false,
+    val syncProgressMessage: String? = null,
+    val syncErrorMessage: String? = null,
+    val syncFailedStage: RfidSyncStage? = null,
 )

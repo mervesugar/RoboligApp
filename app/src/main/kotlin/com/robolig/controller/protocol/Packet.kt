@@ -11,6 +11,11 @@ enum class PacketType(val wireValue: Int) {
     TELEMETRY_RESPONSE(0x05),
     EMERGENCY_STOP(0x0E),
     HEARTBEAT(0x0F),
+    RFID_CONFIG_BEGIN(0x20),
+    RFID_CONFIG_ITEM(0x21),
+    RFID_CONFIG_COMMIT(0x22),
+    RFID_CONFIG_ACK(0x23),
+    RFID_CONFIG_NACK(0x24),
     ;
 
     companion object {

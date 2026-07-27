@@ -2,6 +2,9 @@ package com.robolig.controller.communication
 
 import com.robolig.controller.core.AppLogger
 import com.robolig.controller.core.ApplicationScope
+import com.robolig.controller.core.LogTag
+import com.robolig.controller.domain.rfid.RfidSyncManager
+import com.robolig.controller.protocol.Packet
 import com.robolig.controller.protocol.PacketDecodeResult
 import com.robolig.controller.protocol.PacketDecoder
 import com.robolig.controller.protocol.PacketType
@@ -11,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Singleton
@@ -23,6 +27,7 @@ class InboundPacketProcessor
         private val stateStore: CommunicationStateStore,
         private val clock: MonotonicClock,
         private val logger: AppLogger,
+        private val rfidSyncManagerProvider: Provider<RfidSyncManager>,
         @ApplicationScope private val applicationScope: CoroutineScope,
     ) {
         private var started = false
@@ -70,18 +75,15 @@ class InboundPacketProcessor
                                         ),
                                 )
                             }
-                            processPacket(packet.type, packet.payload)
+                            processPacket(packet)
                         }
                     }
                 }
             }
         }
 
-        private fun processPacket(
-            packetType: PacketType,
-            payload: ByteArray,
-        ) {
-            when (packetType) {
+        private fun processPacket(packet: Packet) {
+            when (packet.type) {
                 PacketType.HEARTBEAT -> heartbeatManager.markReceived()
                 PacketType.EMERGENCY_STOP ->
                     stateStore.update { currentState ->
@@ -90,6 +92,10 @@ class InboundPacketProcessor
                             errors = currentState.errors + "Robot reported emergency stop",
                         )
                     }
+                PacketType.RFID_CONFIG_ACK, PacketType.RFID_CONFIG_NACK -> {
+                    logger.d(LogTag.COMMUNICATION, "Inbound RFID response: ${packet.type}")
+                    rfidSyncManagerProvider.get().onRfidPacketReceived(packet)
+                }
                 else -> Unit
             }
         }

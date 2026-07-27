@@ -251,12 +251,18 @@ private fun SecondaryPacketLine(bytes: ByteArray) {
             PacketType.TELEMETRY_REQUEST -> "telemetry request"
             PacketType.TELEMETRY_RESPONSE -> "telemetry response"
             PacketType.PTZ_CONTROL -> "ptz control"
+            PacketType.RFID_CONFIG_BEGIN -> "rfid begin"
+            PacketType.RFID_CONFIG_ITEM -> "rfid item"
+            PacketType.RFID_CONFIG_COMMIT -> "rfid commit"
+            PacketType.RFID_CONFIG_ACK -> "rfid ack"
+            PacketType.RFID_CONFIG_NACK -> "rfid nack"
             null -> "other"
         }
     val summary =
         when (type) {
             PacketType.VEHICLE_CONTROL -> {
-                val p = VehicleControlPayload.fromPayload(bytes.copyOfRange(4, 4 + ProtocolConstants.PAYLOAD_SIZE_BYTES))
+                val payloadBytes = bytes.copyOfRange(4, 4 + ProtocolConstants.PAYLOAD_SIZE_BYTES)
+                val p = VehicleControlPayload.fromPayload(payloadBytes)
                 "moveX=${formatSigned(p.moveX)} moveY=${formatSigned(p.moveY)} rot=${formatSigned(p.rotation)} " +
                     "throttle=${formatSigned(p.throttle)} brake=${formatSigned(p.brake)} boost=${formatSigned(p.boost)}"
             }
@@ -328,6 +334,11 @@ private fun DecodedPayload(bytes: ByteArray) {
             PacketType.TELEMETRY_RESPONSE -> "TELEMETRY_RESPONSE (inbound only; should never appear here)"
             PacketType.EMERGENCY_STOP -> "no payload — latches E-stop on the bridge"
             PacketType.HEARTBEAT -> "no payload — keeps the watchdog happy"
+            PacketType.RFID_CONFIG_BEGIN -> "RFID_CONFIG_BEGIN"
+            PacketType.RFID_CONFIG_ITEM -> "RFID_CONFIG_ITEM"
+            PacketType.RFID_CONFIG_COMMIT -> "RFID_CONFIG_COMMIT"
+            PacketType.RFID_CONFIG_ACK -> "RFID_CONFIG_ACK"
+            PacketType.RFID_CONFIG_NACK -> "RFID_CONFIG_NACK"
             null -> "unknown packet type 0x${"%02X".format(bytes[1].toInt().and(0xFF))}"
         }
     Text(

@@ -8,6 +8,7 @@ import com.robolig.controller.utils.ControllerPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -168,18 +169,18 @@ class RfidManagementViewModelTest {
 
         assertEquals("CORRUPT_DATA", state.cityUids[City.SINOP])
         assertEquals("Bozuk kayıtlı veri", state.cityErrors[City.SINOP])
-        org.junit.Assert.assertFalse(state.areFiveRecordsComplete)
+        assertFalse(state.areFiveRecordsComplete)
     }
 
     @Test
-    fun `send to robot button is disabled in Phase A`() {
+    fun `send to robot button is disabled when communication or sync is missing`() {
         val prefs = FakeControllerPreferences()
         val viewModel = RfidManagementViewModel(prefs)
 
         val state = viewModel.uiState.value
-        org.junit.Assert.assertFalse(state.isSendToRobotEnabled)
-        org.junit.Assert.assertFalse(state.canSendToRobot)
-        org.junit.Assert.assertFalse(state.isReadyToSendToRobot)
+        assertFalse(state.isSendToRobotEnabled)
+        assertFalse(state.canSendToRobot)
+        assertFalse(state.isReadyToSendToRobot)
     }
 
     @Test

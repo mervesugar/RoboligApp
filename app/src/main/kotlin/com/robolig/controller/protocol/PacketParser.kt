@@ -85,6 +85,11 @@ private fun isPayloadValid(
             PacketType.TELEMETRY_REQUEST,
             PacketType.EMERGENCY_STOP,
             PacketType.HEARTBEAT,
+            PacketType.RFID_CONFIG_BEGIN,
+            PacketType.RFID_CONFIG_ITEM,
+            PacketType.RFID_CONFIG_COMMIT,
+            PacketType.RFID_CONFIG_ACK,
+            PacketType.RFID_CONFIG_NACK,
             -> Unit
             PacketType.TELEMETRY_RESPONSE -> {
                 TelemetryResponsePayload.fromPayload(payload)
